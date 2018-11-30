@@ -21,6 +21,8 @@ public class KafkaApplication {
 
     public static void main(String[] args) throws Exception {
 
+        System.out.println("Kafka Client Application");
+
         ConfigurableApplicationContext context = SpringApplication.run(KafkaApplication.class, args);
 
         MessageProducer producer = context.getBean(MessageProducer.class);
