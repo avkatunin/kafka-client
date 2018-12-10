@@ -1,5 +1,6 @@
 package ru.fleetcor.client;
 
+import java.util.Date;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -35,8 +36,8 @@ public class KafkaApplication {
          * It will also be recieved by the listener with
          * headersKafkaListenerContainerFactory as container factory
          */
-        producer.sendMessage("Hello, World!");
-        listener.latch.await(10, TimeUnit.SECONDS);
+        /*producer.sendMessage("Hello, World!");
+        listener.latch.await(10, TimeUnit.SECONDS);*/
 
         /*
          * Sending message to a topic with 5 partition,
@@ -44,27 +45,32 @@ public class KafkaApplication {
          * listener configuration, only the messages from
          * partition 0 and 3 will be consumed.
          */
-        for (int i = 0; i < 5; i++) {
-            producer.sendMessageToPartion("Hello To Partioned Topic!", i);
+        System.out.println("TimerTask начал свое выполнение в:" + new Date());
+
+        for (int i = 0; i <5000; i++){
+            System.out.println("Message " + new Date());
+            producer.sendMessageToTest("Message " + new Date());
         }
-        listener.partitionLatch.await(10, TimeUnit.SECONDS);
+
+        System.out.println("TimerTask закончил свое выполнение в:" + new Date());
+        listener.filterLatch.await(10, TimeUnit.SECONDS);
 
         /*
          * Sending message to 'filtered' topic. As per listener
          * configuration,  all messages with char sequence
          * 'World' will be discarded.
          */
-        producer.sendMessageToFiltered("Hello Baeldung!");
+        /*producer.sendMessageToFiltered("Hello Baeldung!");
         producer.sendMessageToFiltered("Hello World!");
-        listener.filterLatch.await(10, TimeUnit.SECONDS);
+        listener.filterLatch.await(10, TimeUnit.SECONDS);*/
 
         /*
          * Sending message to 'greeting' topic. This will send
          * and recieved a java object with the help of
          * greetingKafkaListenerContainerFactory.
          */
-        producer.sendGreetingMessage(new Greeting("Greetings", "World!"));
-        listener.greetingLatch.await(10, TimeUnit.SECONDS);
+        /*producer.sendGreetingMessage(new Greeting("Greetings", "World!"));
+        listener.greetingLatch.await(10, TimeUnit.SECONDS);*/
 
         context.close();
     }
@@ -99,12 +105,19 @@ public class KafkaApplication {
         @Value(value = "${greeting.topic.name}")
         private String greetingTopicName;
 
+        @Value(value = "${test.topic.name}")
+        private String testTopicName;
+
         public void sendMessage(String message) {
             kafkaTemplate.send(topicName, message);
         }
 
         public void sendMessageToPartion(String message, int partition) {
             kafkaTemplate.send(partionedTopicName, String.valueOf(partition), message);
+        }
+
+        public void sendMessageToTest(String message) {
+            kafkaTemplate.send(testTopicName, message);
         }
 
         public void sendMessageToFiltered(String message) {
